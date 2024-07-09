@@ -3,3 +3,7 @@ node_modules/
 
 # Ignore environment variables file
 .env
+
+# Ignore build artifacts
+dist/
+build/

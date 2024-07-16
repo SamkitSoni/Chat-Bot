@@ -9,7 +9,7 @@ async function connectToDatabase() {
     }
 }
 
-async function disconnectFromDatabse() {
+async function disconnectFromDatabase() {
     try{
         await disconnect();
     } catch (error){
@@ -18,4 +18,4 @@ async function disconnectFromDatabse() {
     }
 }
 
-export {connectToDatabase , disconnectFromDatabse};
+export {connectToDatabase , disconnectFromDatabase};

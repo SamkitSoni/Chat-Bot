@@ -1,5 +1,7 @@
-import { hash } from "bcrypt"; //use to encrypt password by converting into hashcode before saving into backend
+import { hash , compare } from "bcrypt"; //use to encrypt password by converting into hashcode before saving into backend
 import user from "../models/user.js";
+import { createToken } from "../utils/token.js";
+import { COOKIE_NAME } from "../utils/constant.js";
 
 export const getAllUsers = async(req, res, next) => {
     try {
@@ -18,14 +20,81 @@ export const getAllUsers = async(req, res, next) => {
 
 export const userSignup = async(req, res, next) => {
     try {
-        const {name , email , password} = req.body;
+        const {name , email , password} = req.body; 
+        const existingUser = await user.findOne({email});
+        if(existingUser){
+            return res.status(401).send("User already exists");
+        }
         const hashedPassword = await hash(password , 10); //use of hash function
         const users = new user({name , email , password: hashedPassword});
         await users.save();
-        return res.status(200).json({
+
+        res.clearCookie(COOKIE_NAME , {
+            domain: "localhost",
+            httpOnly: true,
+            signed: true,
+            path: "/",
+        });
+
+        const token = createToken(users._id.toString(), users.email, "7d");
+        const expires = new Date();
+        expires.setDate(expires.getDate() + 7);
+
+        res.cookie(COOKIE_NAME, token , {
+            path: "/",
+            domain: "localhost",
+            expires,
+            httpOnly: true,
+            signed: true,
+        });
+
+        return res.status(201).json({
             message: "User Created!",
             id: users._id.toString(),
         });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Error",
+            cause: error.message,
+        });
+    }
+};
+
+export const userLogin = async(req, res, next) => {
+    try {
+        const {name , email , password} = req.body;
+        const users = await user.findOne({email});
+        if(!users){
+            return res.status(401).send("User not registered");
+        }
+        const passwordCorrect = await compare(password , users.password);
+        if(!passwordCorrect){
+            return res.status(401).send("Incorrect Password");
+        }
+
+        res.clearCookie(COOKIE_NAME , {
+            domain: "localhost",
+            httpOnly: true,
+            signed: true,
+            path: "/",
+        });
+
+        const token = createToken(users._id.toString(), users.email, "7d");
+        const expires = new Date();
+        expires.setDate(expires.getDate() + 7);
+
+        res.cookie(COOKIE_NAME, token , {
+            path: "/",
+            domain: "localhost",
+            expires,
+            httpOnly: true,
+            signed: true,
+        });
+
+        return res.status(200).json({
+            message: "OK",
+            id: users._id.toString(),
+        })    
     } catch (error) {
         return res.status(500).json({
             message: "Error",

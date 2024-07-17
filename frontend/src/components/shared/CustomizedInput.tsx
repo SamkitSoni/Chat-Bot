@@ -1,4 +1,4 @@
-import { colors, TextField } from "@mui/material";
+import { TextField } from "@mui/material";
 
 type Props = {
     name: string,

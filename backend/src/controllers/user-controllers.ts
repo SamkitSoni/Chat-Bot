@@ -50,7 +50,8 @@ export const userSignup = async(req, res, next) => {
 
         return res.status(201).json({
             message: "User Created!",
-            id: users._id.toString(),
+            name: users.name,
+            email: users.email,
         });
     } catch (error) {
         return res.status(500).json({
@@ -93,7 +94,8 @@ export const userLogin = async(req, res, next) => {
 
         return res.status(200).json({
             message: "OK",
-            id: users._id.toString(),
+            name: users.name,
+            email: users.email
         })    
     } catch (error) {
         return res.status(500).json({

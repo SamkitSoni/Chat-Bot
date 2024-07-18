@@ -16,7 +16,8 @@ export const generateChatCompletion = async (req , res , next) => {
         const config = configureOpenAI()
         const openai = new OpenAIApi(config);
         const chatResponse = await openai.createChatCompletion({
-            model: "Gemini 1.0 Pro",
+            // model: "Gemini 1.0 Pro",
+            model: "GPT-3.5 Turbo",
             messages: chats,
         });
         users.chats.push(chatResponse.data.choices[0].message);
